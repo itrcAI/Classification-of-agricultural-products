@@ -3,8 +3,7 @@ import torch.nn.init as init
 
 def weight_init(m):
     '''
-    Initializes a model's parameters.
-    Credits to: https://gist.github.com/jeasinema
+
 
     Usage:
         model = Model()

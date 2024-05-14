@@ -1,6 +1,4 @@
-#
-#TESTING FOR POSITIONAL ENCODING - final
-#PSE BLOCK
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

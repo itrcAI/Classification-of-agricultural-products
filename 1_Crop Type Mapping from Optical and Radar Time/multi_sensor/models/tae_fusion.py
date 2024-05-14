@@ -1,18 +1,3 @@
-#
-#TESTING FOR TSA ENCODING - final
-#TSA BLOCK
-
-
-"""
-Temporal Attention Encoder module
-
-Credits:
-The module is heavily inspired by the works of Vaswani et al. on self-attention and their pytorch implementation of
-the Transformer served as code base for the present script.
-
-paper: https://arxiv.org/abs/1706.03762
-code: github.com/jadore801120/attention-is-all-you-need-pytorch
-"""
 
 import torch
 import torch.nn as nn
@@ -178,8 +163,7 @@ class ScaledDotProductAttention(nn.Module):
 
 
 def get_sinusoid_encoding_table(positions, d_hid, T=1000):
-    ''' Sinusoid position encoding table
-    positions: int or list of integer, if int range(positions)'''
+
 
     if isinstance(positions, int):
         positions = list(range(positions))

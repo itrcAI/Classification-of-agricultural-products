@@ -3,7 +3,7 @@ from torch import nn
 import torch.utils.data as data
 import numpy as np
 import torchnet as tnt
-# from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold
 from sklearn.metrics import confusion_matrix
 import os
 import json
