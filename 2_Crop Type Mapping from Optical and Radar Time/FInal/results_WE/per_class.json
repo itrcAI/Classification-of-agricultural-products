@@ -1,0 +1,116 @@
+{
+    "0": {
+        "IoU": NaN,
+        "Precision": NaN,
+        "Recall": NaN,
+        "F1-score": NaN
+    },
+    "1": {
+        "IoU": 0.0,
+        "Precision": NaN,
+        "Recall": 0.0,
+        "F1-score": 0.0
+    },
+    "2": {
+        "IoU": 0.0,
+        "Precision": NaN,
+        "Recall": 0.0,
+        "F1-score": 0.0
+    },
+    "3": {
+        "IoU": NaN,
+        "Precision": NaN,
+        "Recall": NaN,
+        "F1-score": NaN
+    },
+    "4": {
+        "IoU": NaN,
+        "Precision": NaN,
+        "Recall": NaN,
+        "F1-score": NaN
+    },
+    "5": {
+        "IoU": NaN,
+        "Precision": NaN,
+        "Recall": NaN,
+        "F1-score": NaN
+    },
+    "6": {
+        "IoU": NaN,
+        "Precision": NaN,
+        "Recall": NaN,
+        "F1-score": NaN
+    },
+    "7": {
+        "IoU": NaN,
+        "Precision": NaN,
+        "Recall": NaN,
+        "F1-score": NaN
+    },
+    "8": {
+        "IoU": NaN,
+        "Precision": NaN,
+        "Recall": NaN,
+        "F1-score": NaN
+    },
+    "9": {
+        "IoU": NaN,
+        "Precision": NaN,
+        "Recall": NaN,
+        "F1-score": NaN
+    },
+    "10": {
+        "IoU": NaN,
+        "Precision": NaN,
+        "Recall": NaN,
+        "F1-score": NaN
+    },
+    "11": {
+        "IoU": NaN,
+        "Precision": NaN,
+        "Recall": NaN,
+        "F1-score": NaN
+    },
+    "12": {
+        "IoU": NaN,
+        "Precision": NaN,
+        "Recall": NaN,
+        "F1-score": NaN
+    },
+    "13": {
+        "IoU": NaN,
+        "Precision": NaN,
+        "Recall": NaN,
+        "F1-score": NaN
+    },
+    "14": {
+        "IoU": NaN,
+        "Precision": NaN,
+        "Recall": NaN,
+        "F1-score": NaN
+    },
+    "15": {
+        "IoU": 0.4387755102040816,
+        "Precision": 0.4387755102040816,
+        "Recall": 1.0,
+        "F1-score": 0.6099290780141844
+    },
+    "16": {
+        "IoU": NaN,
+        "Precision": NaN,
+        "Recall": NaN,
+        "F1-score": NaN
+    },
+    "17": {
+        "IoU": NaN,
+        "Precision": NaN,
+        "Recall": NaN,
+        "F1-score": NaN
+    },
+    "18": {
+        "IoU": NaN,
+        "Precision": NaN,
+        "Recall": NaN,
+        "F1-score": NaN
+    }
+}
