@@ -48,6 +48,7 @@ def confusion_matrix_analysis(mat):
     TP = 0
     FP = 0
     FN = 0
+    pre = 0
 
     per_class = {}
 
@@ -56,6 +57,9 @@ def confusion_matrix_analysis(mat):
         tp = np.sum(mat[j, j])
         fp = np.sum(mat[:, j]) - tp
         fn = np.sum(mat[j, :]) - tp
+        probR = (np.sum(mat[j, :]))/(np.sum(mat))
+        probP = (np.sum(mat[:, j]))/(np.sum(mat))
+        chance = probR * probP
 
         d['IoU'] = tp / (tp + fp + fn)
         d['Precision'] = tp / (tp + fp)
@@ -67,12 +71,16 @@ def confusion_matrix_analysis(mat):
         TP += tp
         FP += fp
         FN += fn
+        pre += chance
 
+    pra = np.sum(np.diag(mat)) / np.sum(mat)
+    
     overall = {}
     overall['micro_IoU'] = TP / (TP + FP + FN)
     overall['micro_Precision'] = TP / (TP + FP)
     overall['micro_Recall'] = TP / (TP + FN)
     overall['micro_F1-score'] = 2 * TP / (2 * TP + FP + FN)
+    overall['micro_Kappa'] = (pra-pre)/(1-pre)
 
     macro = pd.DataFrame(per_class).transpose().mean()
     overall['MACRO_IoU'] = macro.loc['IoU']
