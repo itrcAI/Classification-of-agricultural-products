@@ -6,16 +6,16 @@
         "F1-score": NaN
     },
     "1": {
-        "IoU": 0.5869565217391305,
-        "Precision": 1.0,
-        "Recall": 0.5869565217391305,
-        "F1-score": 0.7397260273972602
+        "IoU": 0.9155844155844156,
+        "Precision": 0.94,
+        "Recall": 0.9724137931034482,
+        "F1-score": 0.9559322033898305
     },
     "2": {
-        "IoU": 0.0,
-        "Precision": NaN,
-        "Recall": 0.0,
-        "F1-score": 0.0
+        "IoU": 0.9017094017094017,
+        "Precision": 0.9419642857142857,
+        "Recall": 0.9547511312217195,
+        "F1-score": 0.9483146067415731
     },
     "3": {
         "IoU": NaN,
@@ -24,34 +24,34 @@
         "F1-score": NaN
     },
     "4": {
-        "IoU": 0.0,
-        "Precision": 0.0,
+        "IoU": NaN,
+        "Precision": NaN,
         "Recall": NaN,
-        "F1-score": 0.0
+        "F1-score": NaN
     },
     "5": {
-        "IoU": 0.0,
-        "Precision": 0.0,
-        "Recall": NaN,
-        "F1-score": 0.0
+        "IoU": 0.06896551724137931,
+        "Precision": 0.6666666666666666,
+        "Recall": 0.07142857142857142,
+        "F1-score": 0.12903225806451613
     },
     "6": {
-        "IoU": NaN,
+        "IoU": 0.0,
         "Precision": NaN,
-        "Recall": NaN,
-        "F1-score": NaN
+        "Recall": 0.0,
+        "F1-score": 0.0
     },
     "7": {
-        "IoU": NaN,
-        "Precision": NaN,
-        "Recall": NaN,
-        "F1-score": NaN
+        "IoU": 0.8333333333333334,
+        "Precision": 0.9090909090909091,
+        "Recall": 0.9090909090909091,
+        "F1-score": 0.9090909090909091
     },
     "8": {
-        "IoU": NaN,
-        "Precision": NaN,
-        "Recall": NaN,
-        "F1-score": NaN
+        "IoU": 1.0,
+        "Precision": 1.0,
+        "Recall": 1.0,
+        "F1-score": 1.0
     },
     "9": {
         "IoU": NaN,
@@ -60,28 +60,28 @@
         "F1-score": NaN
     },
     "10": {
-        "IoU": NaN,
-        "Precision": NaN,
-        "Recall": NaN,
-        "F1-score": NaN
+        "IoU": 0.2,
+        "Precision": 1.0,
+        "Recall": 0.2,
+        "F1-score": 0.3333333333333333
     },
     "11": {
-        "IoU": NaN,
-        "Precision": NaN,
-        "Recall": NaN,
-        "F1-score": NaN
+        "IoU": 0.5333333333333333,
+        "Precision": 0.6153846153846154,
+        "Recall": 0.8,
+        "F1-score": 0.6956521739130435
     },
     "12": {
-        "IoU": 0.0,
-        "Precision": 0.0,
-        "Recall": NaN,
-        "F1-score": 0.0
-    },
-    "13": {
         "IoU": NaN,
         "Precision": NaN,
         "Recall": NaN,
         "F1-score": NaN
+    },
+    "13": {
+        "IoU": 0.2857142857142857,
+        "Precision": 0.4444444444444444,
+        "Recall": 0.4444444444444444,
+        "F1-score": 0.4444444444444444
     },
     "14": {
         "IoU": NaN,
@@ -90,10 +90,10 @@
         "F1-score": NaN
     },
     "15": {
-        "IoU": 0.7,
-        "Precision": 0.711864406779661,
-        "Recall": 0.9767441860465116,
-        "F1-score": 0.8235294117647058
+        "IoU": 0.9337094499294781,
+        "Precision": 0.9720998531571219,
+        "Recall": 0.9594202898550724,
+        "F1-score": 0.9657184536834428
     },
     "16": {
         "IoU": NaN,
@@ -102,10 +102,10 @@
         "F1-score": NaN
     },
     "17": {
-        "IoU": NaN,
-        "Precision": NaN,
+        "IoU": 0.0,
+        "Precision": 0.0,
         "Recall": NaN,
-        "F1-score": NaN
+        "F1-score": 0.0
     },
     "18": {
         "IoU": NaN,

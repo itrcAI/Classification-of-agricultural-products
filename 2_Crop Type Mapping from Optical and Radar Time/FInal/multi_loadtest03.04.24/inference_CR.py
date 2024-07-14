@@ -11,6 +11,8 @@ import pickle as pkl
 import argparse
 import pprint
 from tqdm import tqdm
+import seaborn as sns
+
 
 from models.stclassifier_fusion import PseTae_pretrained
 from dataset_fusion import PixelSetData
@@ -152,20 +154,30 @@ def overall_performance(args):
 
     
     
-    #labelss = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s']
-    #disp = ConfusionMatrixDisplay(confusion_matrix=mat, display_labels =labelss)
-    disp = ConfusionMatrixDisplay(confusion_matrix=mat)
-
-    fig, ax = plt.subplots(figsize=(21, 17))  # Set desired width and height
-    disp.plot(ax=ax)
-    # Customize additional plot elements as needed (e.g., fontsize, colormap)
-    ax.tick_params(axis='both', which='major', labelsize=15)  # Adjust tick label fontsize
-    plt.setp(disp.ax_.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
-    plt.setp(disp.ax_.get_yticklabels(), rotation=45, ha="right", rotation_mode="anchor")
-    plt.tight_layout()
-    save_path_cm = os.path.join(args['output_dir'], "confusion_matrix.png")
-    plt.savefig(save_path_cm)
-    #plt.show() 
+    
+        # ----> save confusion matrix
+    true_labels =  ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's']
+    predicted_labels =  ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's']
+    plt.figure(figsize=(15,10))
+    img = sns.heatmap(mat, annot = True, fmt='.2f',linewidths=0.5, cmap='OrRd',xticklabels=predicted_labels, yticklabels=true_labels)
+    img.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
+    img.set(ylabel="True Label", xlabel="Predicted Label")
+    img.figure.savefig(os.path.join(args['output_dir'], 'conf_mat_picture.png'))
+    img.get_figure().clf()
+    ########errrrrrrrrrrrrr
+    mat1 = mat
+    col_totals = mat1.sum(axis=0)  # Sum of each column
+    normalized_mat1 = mat1 / col_totals[np.newaxis, :]  # Normalize each column separately
+    
+    # Plotting
+    plt.figure(figsize=(15, 10))
+    img = sns.heatmap(normalized_mat1, annot=True, fmt='.2f', linewidths=0.5, cmap='OrRd', cbar=True,xticklabels=predicted_labels, yticklabels=true_labels)
+    img.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
+    img.set(ylabel="True Label", xlabel="Predicted Label")
+    img.figure.savefig(os.path.join(args['output_dir'], 'conf_mat_picture_perclass.png'))
+    img.get_figure().clf()
+    
+    
     
 def main(args):
     print('Preparation . . . ')
@@ -185,7 +197,7 @@ if __name__ == '__main__':
 
 
     # Set-up parameters
-    parser.add_argument('--dataset_folder', default='/home/mhbokaei/shakouri/CropTypeMappinp/multi_sensor/All_dataset/dataset_100/test_folder/s1_data', type=str,
+    parser.add_argument('--dataset_folder', default='/home/mhbokaei/shakouri/CropTypeMappinp/multi_sensor/All_dataset/dataset_10000/test_folder/s1_data', type=str,
                         help='Path to the Test Folder.')
     parser.add_argument('--weight_dir', default='/home/mhbokaei/shakouri/CropTypeMappinp/multi_loadtest/results_we', type=str,
                         help='Path to the folder containing the model weights')
@@ -209,7 +221,7 @@ if __name__ == '__main__':
     parser.add_argument('--sub_class', default=None, type=list, help='Identify the subclass of the class')
 
     # Dataset parameters
-    parser.add_argument('--batch_size', default=16, type=int, help='Batch size')
+    parser.add_argument('--batch_size', default=30, type=int, help='Batch size')
     parser.add_argument('--npixel', default=64, type=int, help='Number of pixels to sample from the input images')
 
     # Architecture Hyperparameters
