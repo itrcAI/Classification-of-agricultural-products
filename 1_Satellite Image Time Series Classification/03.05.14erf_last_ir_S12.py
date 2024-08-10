@@ -194,8 +194,8 @@ def save_results(fold, metrics, conf_mat, args):
         json.dump(metrics, outfile, indent=4)
     pkl.dump(conf_mat, open(os.path.join(args['res_dir'], 'Fold_{}'.format(fold), 'conf_mat.pkl'), 'wb'))
     ########Confusion Matrix Display#######errrrrrrrr
-    true_labels =  ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l']
-    predicted_labels =  ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l']
+    true_labels = args['x_labels_list']
+    predicted_labels =  args['x_labels_list']
     plt.figure(figsize=(15,10))
     img = sns.heatmap(conf_mat, annot = True, fmt='d',linewidths=0.5, cmap='OrRd',xticklabels=predicted_labels, yticklabels=true_labels)
     img.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
@@ -217,6 +217,7 @@ def save_results(fold, metrics, conf_mat, args):
 def point_plot(data,
                D_list,  ##List of deleted classes
                path : str,
+               x_labels_list: list, 
                x_lable : str,
                y_lable : str,
                title : str):
@@ -233,6 +234,7 @@ def point_plot(data,
     for _x, _y in zip(x, y):
         plt.text(_x, _y, f'{_y:.0f}', fontsize=9, ha='center', va='bottom')
     plt.plot(x, y, marker='o', linestyle='--')
+    plt.xticks(x, x_labels_list)
     plt.xlabel(x_lable)
     plt.ylabel(y_lable)
     plt.title(title)
@@ -265,7 +267,7 @@ def Data_distribution(args):
             counter[_class] = 0
     counter = dict(sorted(counter.items(), key=lambda item:item[0]))
     save_path_cn = os.path.join(args['res_dir'], "number_of_classes.png")
-    point_plot(counter,args['Delet_label_class'], save_path_cn, "Classes", "Number", "Number of each class")
+    point_plot(counter,args['Delet_label_class'], save_path_cn,args['x_labels_list'], "Classes", "Number", "Number of each class")
 
 ###########################################################################################
 
@@ -430,18 +432,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     # Set-up parameters
-    # /home/mhbokaei/shakouri/test/Satellite/Alldata/dataset_folder100
-    # /home/mhbokaei/shakouri/test/Satellite/Alldata/dataset_folder10000
-    # /home/mhbokaei/shakouri/test/Satellite/Alldata/dataset_folder50000
-    # /home/mhbokaei/shakouri/test/Satellite/Alldata/dataset_folder90000
-    # /home/mhbokaei/shakouri/SatelliteImage_TimeSeries_Classification/dataset_folder
-    # /home/mhbokaei/shakouri/test/Satellite/Alldata/dataset_folder_train
-    # /home/mhbokaei/shakouri/test/Satellite/Alldata/dataset_alireza0/
-     
+    # /home/mhbokaei/shakouri/test/Satellite/Alldata/dataset_ir_split_s1s2/S2
+    # /home/mhbokaei/shakouri/test/Satellite/Alldata/dataset_ir_s12
     
-    parser.add_argument('--dataset_folder', default='/home/mhbokaei/shakouri/test/Satellite/Alldata/dataset_alireza0', type=str,
+    parser.add_argument('--dataset_folder', default='/home/mhbokaei/shakouri/test/Satellite/Alldata/dataset_ir_s12', type=str,
                         help='Path to the folder where the results are saved.')
-    parser.add_argument('--dataset_folder_sepT', default='/home/mhbokaei/shakouri/test/Satellite/Alldata/dataset_alireza0', type=str,
+    parser.add_argument('--dataset_folder_sepT', default='/home/mhbokaei/shakouri/test/Satellite/Alldata/dataset_ir_s12', type=str,
                         help='Path to the folder where the results are saved.')
     parser.add_argument('--separate_test', default='no', type=str, help='Shows the dataset for Test is different(no  yes)')
 
@@ -458,6 +454,9 @@ if __name__ == '__main__':
     parser.add_argument('--label_class', default='label_12class', type=str, help='it can be label_19class or label_44class')
     parser.add_argument('--sub_class', default=None, type=list, help='Identify the subclass of the class')
     parser.add_argument('--Delet_label_class', default=[], type=list, help='Plot the number of data per classes')
+    parser.add_argument('--x_labels_list', default=['OT','G','P','O','F','Z','WI','BI','V','A','C','S',], type=list, help='The name of classes')
+
+
 
 
     # Training parameters

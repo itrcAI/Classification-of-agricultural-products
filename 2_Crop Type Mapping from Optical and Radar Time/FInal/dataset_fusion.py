@@ -12,7 +12,7 @@ import json
 import random
 
 class PixelSetData(data.Dataset):
-    def __init__(self, folder, labels, npixel, sub_classes=None, norm=None,
+    def __init__(self, folder, labels, npixel, sub_classes=None, norm_s1=None, norm_s2=None,
                  extra_feature=None, jitter=(0.01, 0.05), minimum_sampling=27, interpolate_method ='nn', return_id=False, fusion_type=None):
         """
         Args:
@@ -36,7 +36,8 @@ class PixelSetData(data.Dataset):
         self.meta_folder = os.path.join(folder, 'META')
         self.labels = labels
         self.npixel = npixel
-        self.norm = norm
+        self.norm_s1 = norm_s1
+        self.norm_s2 = norm_s2
         self.extra_feature = extra_feature
         self.jitter = jitter  # (sigma , clip )
         self.return_id = return_id
@@ -157,7 +158,7 @@ class PixelSetData(data.Dataset):
                 Extra-features : Sequence_length x Number of additional features
 
         """
-        # loader for x0 = sentinel1 and x00 = sentinel2
+        # loader for x0 = x = sentinel1 and x00 = x2 = sentinel2
 
         x0 = np.load(os.path.join(self.folder, 'DATA', '{}.npy'.format(self.pid[item])))
         x00 = np.load(os.path.join(self.folder.replace('s1_data', 's2_data'), 'DATA', '{}.npy'.format(self.pid[item])))
@@ -211,20 +212,36 @@ class PixelSetData(data.Dataset):
             x2 = x00
             mask1, mask2 = np.ones(self.npixel), np.ones(self.npixel)
 
-        if self.norm is not None:
-            m, s = self.norm
-            m = np.array(m)
-            s = np.array(s)
+        if self.norm_s1 is not None:
+            m1, s1 = self.norm_s1
+            m1 = np.array(m1)
+            s1 = np.array(s1)
 
-            if len(m.shape) == 0:
-                x = (x - m) / s
-            elif len(m.shape) == 1:  # Normalise channel-wise
-                x = (x.swapaxes(1, 2) - m) / s
+            if len(m1.shape) == 0:
+                x = (x - m1) / s1
+            elif len(m1.shape) == 1:  # Normalise channel-wise
+                x = (x.swapaxes(1, 2) - m1) / s1
                 x = x.swapaxes(1, 2)  # Normalise channel-wise for each date
-            elif len(m.shape) == 2:
+            elif len(m1.shape) == 2:
                 x = np.rollaxis(x, 2)  # TxCxS -> SxTxC
-                x = (x - m) / s
+                x = (x - m1) / s1
                 x = np.swapaxes((np.rollaxis(x, 1)), 1, 2)
+                
+        if self.norm_s2  is not None:
+            m2, s2 = self.norm_s2
+            m2 = np.array(m2)
+            s2 = np.array(s2)
+
+            if len(m2.shape) == 0:
+                x2 = (x2 - m2) / s2
+            elif len(m2.shape) == 1:  # Normalise channel-wise
+                x2 = (x2.swapaxes(1, 2) - m2) / s2
+                x2 = x2.swapaxes(1, 2)  # Normalise channel-wise for each date
+            elif len(m2.shape) == 2:
+                x2 = np.rollaxis(x2, 2)  # TxCxS -> SxTxC
+                x2 = (x2 - m2) / s2
+                x2 = np.swapaxes((np.rollaxis(x2, 1)), 1, 2)                
+                
                 
         x = x.astype('float')
         x2 = x2.astype('float')
@@ -282,9 +299,9 @@ class PixelSetData(data.Dataset):
 class PixelSetData_preloaded(PixelSetData):
     """ Wrapper class to load all the dataset to RAM at initialization (when the hardware permits it).
     """
-    def __init__(self, folder, labels, npixel, sub_classes=None, norm=None,
+    def __init__(self, folder, labels, npixel, sub_classes=None, norm_s1=None, norm_s2=None,
                  extra_feature=None, jitter=(0.01, 0.05), minimum_sampling=27, interpolate_method ='nn', return_id=False, fusion_type=None):
-        super(PixelSetData_preloaded, self).__init__(folder, labels, npixel, sub_classes, norm, extra_feature, jitter,                           minimum_sampling, interpolate_method, return_id, fusion_type)
+        super(PixelSetData_preloaded, self).__init__(folder, labels, npixel, sub_classes, norm_s1, norm_s2, extra_feature, jitter, minimum_sampling, interpolate_method, return_id, fusion_type)
         
         self.samples = []
         print('Loading samples to memory . . .')
