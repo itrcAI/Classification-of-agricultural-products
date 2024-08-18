@@ -17,18 +17,20 @@ class PseTae(nn.Module):
     Pixel-Set encoder + Temporal Attention Encoder sequence classifier
     """
 
-    def __init__(self, input_dim=10, mlp1=[10, 32, 64], pooling='mean_std', mlp2=[132, 128], with_extra=False,
+    def __init__(self, input_dim_s1=2,input_dim_s2=10, mlp1=[10, 32, 64], pooling='mean_std', mlp2=[132, 128], with_extra=False,
                  extra_size=4,
-                 n_head=4, d_k=32, d_model=None, mlp3=[512, 128, 128], dropout=0.2, T=1000, len_max_seq=24,
+                 n_head=4, d_k=32, d_model=None, mlp3=[512, 128, 128], dropout=0.2, T=1000, len_max_seq=55,
                  positions=None,
                  mlp4=[128, 64, 32, 12], fusion_type=None):
         
         super(PseTae, self).__init__()
         
 
-        self.s1_max_len = 75
-        self.s2_max_len = 27
-        self.early_seq_mlp1 = [12, 32, 64]
+        self.s1_max_len = len_max_seq
+        self.s2_max_len = len_max_seq
+        
+        self.early_seq_mlp1 = copy.deepcopy(mlp1)
+        self.early_seq_mlp1[0] = input_dim_s1+input_dim_s2      
         self.positions = positions 
         
 
@@ -42,14 +44,14 @@ class PseTae(nn.Module):
 
         # ----------------pse fusion
         self.mlp1_s1 = copy.deepcopy(mlp1)
-        self.mlp1_s1[0] = 2 
+        self.mlp1_s1[0] = input_dim_s1 
         self.mlp3_pse = [1024, 512, 256]  
           
 
-        self.spatial_encoder_s2 =  PixelSetEncoder(input_dim, mlp1=mlp1, pooling=pooling, mlp2=mlp2, with_extra=with_extra,
+        self.spatial_encoder_s2 =  PixelSetEncoder(input_dim_s2, mlp1=mlp1, pooling=pooling, mlp2=mlp2, with_extra=with_extra,
                                                extra_size=extra_size)
         
-        self.spatial_encoder_s1 = PixelSetEncoder(self.mlp1_s1[0], mlp1=self.mlp1_s1, pooling=pooling, mlp2=mlp2, with_extra=with_extra,
+        self.spatial_encoder_s1 = PixelSetEncoder(input_dim_s1, mlp1=self.mlp1_s1, pooling=pooling, mlp2=mlp2, with_extra=with_extra,
                                        extra_size=extra_size)
     
 

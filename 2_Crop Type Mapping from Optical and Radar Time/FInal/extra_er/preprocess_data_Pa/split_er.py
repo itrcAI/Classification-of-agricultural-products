@@ -46,7 +46,7 @@ def split_data_set(path_file_npy : str,
                   validation_size : float) -> None:
 
 
-
+    random.seed(42)
     if True:
 
         def remover_data(files ,elements):

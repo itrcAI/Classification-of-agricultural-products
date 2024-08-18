@@ -26,8 +26,8 @@ class PseTae(nn.Module):
         super(PseTae, self).__init__()
         
 
-        self.s1_max_len = 75
-        self.s2_max_len = 27
+        self.s1_max_len = len_max_seq
+        self.s2_max_len = len_max_seq
         self.early_seq_mlp1 = [12, 32, 64]
         self.positions = positions 
         
