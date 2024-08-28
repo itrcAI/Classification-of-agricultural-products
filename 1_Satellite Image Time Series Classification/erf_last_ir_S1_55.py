@@ -205,7 +205,8 @@ def save_results(fold, metrics, conf_mat, args):
 
     mat1 = conf_mat
     col_totals = mat1.sum(axis=0)  # Sum of each column
-    normalized_mat1 = mat1 / col_totals[np.newaxis, :]  # Normalize each column separately
+    zero_cols = np.where(col_totals == 0)[0]
+    normalized_mat1 = np.where(col_totals == 0, 0, mat1 / col_totals)
     plt.figure(figsize=(15, 10))
     img = sns.heatmap(normalized_mat1, annot=True, fmt='.2f', linewidths=0.5, cmap='OrRd', cbar=True,xticklabels=predicted_labels, yticklabels=true_labels)
     img.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
@@ -289,8 +290,8 @@ def main(args):
     np.random.seed(args['rdm_seed'])
     torch.manual_seed(args['rdm_seed'])
     prepare_output(args)
-    mean_std = pkl.load(open(args['dataset_folder'] + '/S2-2017-T31TFM-meanstd.pkl', 'rb'))
-    mean_std_sepT = pkl.load(open(args['dataset_folder_sepT'] + '/S2-2017-T31TFM-meanstd.pkl', 'rb'))
+    mean_std = pkl.load(open(args['dataset_folder'] + '/mean_std_s1.pkl', 'rb'))
+    mean_std_sepT = pkl.load(open(args['dataset_folder_sepT'] + '/mean_std_s1.pkl', 'rb'))
 
     # 19 - 44 classes None label_class sub_class
 
@@ -432,16 +433,17 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     # Set-up parameters
-    # /home/mhbokaei/shakouri/test/Satellite/Alldata/dataset_ir_split_s1s2/S2
-    # /home/mhbokaei/shakouri/test/Satellite/Alldata/dataset_ir_s12
+    # ['WR','S','PO','SB','BR','BI','NK','C','M','WI','B','P','OF','A','Z','O','TO','OT','F']
+    # /home/mhbokaei/shakouri/ALLDATA/block/iran/29000_030605/SA/S1/train
+    # 
     
-    parser.add_argument('--dataset_folder', default='/home/mhbokaei/shakouri/test/Satellite/Alldata/dataset_ir_s12', type=str,
+    parser.add_argument('--dataset_folder', default='/home/mhbokaei/shakouri/ALLDATA/block/iran/29000_030605/SA/S1/train', type=str,
                         help='Path to the folder where the results are saved.')
-    parser.add_argument('--dataset_folder_sepT', default='/home/mhbokaei/shakouri/test/Satellite/Alldata/dataset_ir_s12', type=str,
+    parser.add_argument('--dataset_folder_sepT', default='/home/mhbokaei/shakouri/ALLDATA/block/iran/29000_030605/SA/S1/test', type=str,
                         help='Path to the folder where the results are saved.')
-    parser.add_argument('--separate_test', default='no', type=str, help='Shows the dataset for Test is different(no  yes)')
+    parser.add_argument('--separate_test', default='yes', type=str, help='Shows the dataset for Test is different(no  yes)')
 
-    parser.add_argument('--res_dir', default='./results', help='Path to the folder where the results should be stored')
+    parser.add_argument('--res_dir', default='./results_s1', help='Path to the folder where the results should be stored')
     parser.add_argument('--num_workers', default=8, type=int, help='Number of data loading workers')
     parser.add_argument('--rdm_seed', default=1, type=int, help='Random seed')
     parser.add_argument('--device', default='cuda', type=str,
@@ -451,13 +453,10 @@ if __name__ == '__main__':
     parser.add_argument('--preload', dest='preload', action='store_true',
                         help='If specified, the whole dataset is loaded to RAM at initialization')
     parser.set_defaults(preload=False)
-    parser.add_argument('--label_class', default='label_12class', type=str, help='it can be label_19class or label_44class')
+    parser.add_argument('--label_class', default='label_51class', type=str, help='it can be label_19class or label_44class')
     parser.add_argument('--sub_class', default=None, type=list, help='Identify the subclass of the class')
     parser.add_argument('--Delet_label_class', default=[], type=list, help='Plot the number of data per classes')
-    parser.add_argument('--x_labels_list', default=['OT','G','P','O','F','Z','WI','BI','V','A','C','S',], type=list, help='The name of classes')
-
-
-
+    parser.add_argument('--x_labels_list', default= ['WR','S','PO','SB','BR','BI','NK','C','M','WI','B','P','OF','A','Z','O','TO','OT','F'], type=list, help='The name of classes')
 
     # Training parameters
     parser.add_argument('--kfold', default=5, type=int, help='Number of folds for cross validation')
@@ -469,8 +468,8 @@ if __name__ == '__main__':
 
     # Architecture Hyperparameters
     ## PSE
-    parser.add_argument('--input_dim', default=19, type=int, help='Number of channels of input images')
-    parser.add_argument('--mlp1', default='[19,32,64]', type=str, help='Number of neurons in the layers of MLP1')
+    parser.add_argument('--input_dim', default=4, type=int, help='Number of channels of input images')
+    parser.add_argument('--mlp1', default='[4,32,64]', type=str, help='Number of neurons in the layers of MLP1')
     parser.add_argument('--pooling', default='mean_std', type=str, help='Pixel-embeddings pooling strategy')
     parser.add_argument('--mlp2', default='[135,128]', type=str, help='Number of neurons in the layers of MLP2')
     parser.add_argument('--geomfeat', default=1, type=int,
@@ -483,13 +482,13 @@ if __name__ == '__main__':
     parser.add_argument('--T', default=1000, type=int, help='Maximum period for the positional encoding')
     parser.add_argument('--positions', default='bespoke', type=str,
                         help='Positions to use for the positional encoding (bespoke / order)')
-    parser.add_argument('--lms', default=None, type=int,
+    parser.add_argument('--lms', default=55, type=int,
                         help='Maximum sequence length for positional encoding (only necessary if positions == order)')
     parser.add_argument('--dropout', default=0.2, type=float, help='Dropout probability')
 
     ## Classifier
-    parser.add_argument('--num_classes', default=12, type=int, help='Number of classes')
-    parser.add_argument('--mlp4', default='[128, 64, 32, 12]', type=str, help='Number of neurons in the layers of MLP4')
+    parser.add_argument('--num_classes', default=19, type=int, help='Number of classes')
+    parser.add_argument('--mlp4', default='[128, 64, 32, 19]', type=str, help='Number of neurons in the layers of MLP4')
 
 
 
