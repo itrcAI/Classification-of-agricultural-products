@@ -123,28 +123,12 @@ def test_evaluation(model, criterion, loader, device, args, mode='test'):
         y_p = prediction.argmax(dim=1).cpu().numpy()
         y_pred.extend(list(y_p))
 
-    
-    
-    a_true = y_true[:20]
-    a_pred = y_pred[:20]
-    
-    print("len(a_true):",len(a_true))
-    print("a_true:",a_true)
-    print("len(a_pred):",len(a_pred))
-    print("a_pred:",a_pred)
-    
+   
     
     y_true = [x if x in args['main_classes'] else args['others_classes'] for x in y_true]
     y_pred = [x if x in args['main_classes'] else args['others_classes'] for x in y_pred]
 
-    a_true1 = y_true[:20]
-    a_pred1 = y_pred[:20]
-    
-    print("len(a_true1):",len(a_true1))
-    print("a_true1:",a_true1)
-    print("len(a_pred1):",len(a_pred1))
-    print("a_pred1:",a_pred1)
-    
+   
     
     metrics = {'{}_accuracy'.format(mode): acc_meter.value()[0],
                '{}_loss'.format(mode): loss_meter.value()[0],
@@ -531,7 +515,7 @@ if __name__ == '__main__':
     parser.add_argument('--interpolate_method', default='nn', type=str,
                         help='type of interpolation for early and pse fusion. eg. "nn","linear"')    
     
-    parser.add_argument('--res_dir', default='./results_reclass', help='Path to the folder where the results should be stored')
+    parser.add_argument('--res_dir', default='./results_reclass_ss', help='Path to the folder where the results should be stored')
     parser.add_argument('--num_workers', default=8, type=int, help='Number of data loading workers')
     parser.add_argument('--rdm_seed', default=1, type=int, help='Random seed')
     parser.add_argument('--device', default='cuda', type=str,
