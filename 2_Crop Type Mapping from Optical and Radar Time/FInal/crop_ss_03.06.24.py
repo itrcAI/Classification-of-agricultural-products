@@ -123,12 +123,11 @@ def test_evaluation(model, criterion, loader, device, args, mode='test'):
         y_p = prediction.argmax(dim=1).cpu().numpy()
         y_pred.extend(list(y_p))
 
-   
+       
     
     y_true = [x if x in args['main_classes'] else args['others_classes'] for x in y_true]
     y_pred = [x if x in args['main_classes'] else args['others_classes'] for x in y_pred]
-
-   
+    
     
     metrics = {'{}_accuracy'.format(mode): acc_meter.value()[0],
                '{}_loss'.format(mode): loss_meter.value()[0],
@@ -214,15 +213,18 @@ def save_results(metrics, conf_mat, args, y_true, y_pred):
     pkl.dump(y_pred, open(os.path.join(args['res_dir'], 'y_pred_test_data.pkl'), 'wb'))
 
     # ----> save confusion matrix
-    true_labels =  args['x_labels_list']
-    predicted_labels =  args['x_labels_list']
+    #just test classes
+    true_labels =  args['x_labels_list_test']
+    predicted_labels =  args['x_labels_list_test']
     plt.figure(figsize=(15,10))
+    # eleminate Classes
+    conf_mat = conf_mat[np.ix_(args['cm_test_classes'], args['cm_test_classes'])]
     img = sns.heatmap(conf_mat, annot = True, fmt='d',linewidths=0.5, cmap='OrRd',xticklabels=predicted_labels, yticklabels=true_labels)
     img.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
     img.set(ylabel="True Label", xlabel="Predicted Label")
     img.figure.savefig(os.path.join(args['res_dir'], 'conf_mat_picture.png'))
     img.get_figure().clf()
-    ########errrrrrrrrrrrrr
+    ########
     mat1 = conf_mat
     col_totals = mat1.sum(axis=0)  # Sum of each column
     normalized_mat1 = mat1 / col_totals[np.newaxis, :]  # Normalize each column separately
@@ -487,24 +489,28 @@ if __name__ == '__main__':
     #/home/mhbokaei/shakouri/ALLDATA/block/iran/29000_030605/main_no_interpolate/run/CR/val_folder/s1_data
     #/home/mhbokaei/shakouri/ALLDATA/block/iran/29000_030605/main_no_interpolate/run/CR/test_folder/s1_data
 
+    #/home/mhbokaei/shakouri/ALLDATA/block/iran/Hamadan_8000_54000/nointerpolat/run/CR/dataset_folder/s1_data
+    #/home/mhbokaei/shakouri/ALLDATA/block/iran/Hamadan_8000_54000/nointerpolat/run/CR/val_folder/s1_data
+    #/home/mhbokaei/shakouri/ALLDATA/block/iran/Hamadan_8000_54000/nointerpolat/run/CR/test_folder/s1_data
+
 
     
 
 
     # Set-up parameters
-    parser.add_argument('--dataset_folder', default='/home/mhbokaei/shakouri/ALLDATA/block/iran/3000/split_cr/Final/dataset_folder/s1_data', type=str,
+    parser.add_argument('--dataset_folder', default='/home/mhbokaei/shakouri/ALLDATA/block/iran/Hamadan_8000_54000/nointerpolat/run/CR_date_0401_0920/dataset_folder/s1_data', type=str,
                         help='Path to the train data.')
 
     # set-up data loader folders -----------------------------
     parser.add_argument('--dataset_folder2', default=None, type=str,
                         help='Path to second train folder to concat with first initial loader.')
-    parser.add_argument('--val_folder', default='/home/mhbokaei/shakouri/ALLDATA/block/iran/3000/split_cr/Final/val_folder/s1_data', type=str,
+    parser.add_argument('--val_folder', default='/home/mhbokaei/shakouri/ALLDATA/block/iran/Hamadan_8000_54000/nointerpolat/run/CR_date_0401_0920/val_folder/s1_data', type=str,
                         help='Path to the validation folder.')
-    parser.add_argument('--test_folder', default='/home/mhbokaei/shakouri/ALLDATA/block/iran/3000/split_cr/Final/test_folder/s1_data', type=str,
+    parser.add_argument('--test_folder', default='/home/mhbokaei/shakouri/ALLDATA/block/iran/Hamadan_8000_54000/nointerpolat/run/CR_date_0401_0920/test_folder/s1_data', type=str,
                         help='Path to the test folder.')
-    parser.add_argument('--dataset_folder_meanstd1', default='/home/mhbokaei/shakouri/ALLDATA/block/iran/3000/split_cr/Final/dataset_folder/s1_data', type=str,
+    parser.add_argument('--dataset_folder_meanstd1', default='/home/mhbokaei/shakouri/ALLDATA/block/iran/Hamadan_8000_54000/nointerpolat/run/CR_date_0401_0920/dataset_folder/s1_data', type=str,
                         help='Path to mean-std1.')
-    parser.add_argument('--dataset_folder_meanstd2', default='/home/mhbokaei/shakouri/ALLDATA/block/iran/3000/split_cr/Final/dataset_folder/s2_data', type=str,
+    parser.add_argument('--dataset_folder_meanstd2', default='/home/mhbokaei/shakouri/ALLDATA/block/iran/Hamadan_8000_54000/nointerpolat/run/CR_date_0401_0920/dataset_folder/s2_data', type=str,
                         help='Path to mean-std2.')
                         
     # ---------------------------add sensor argument to test s1/s2
@@ -515,7 +521,7 @@ if __name__ == '__main__':
     parser.add_argument('--interpolate_method', default='nn', type=str,
                         help='type of interpolation for early and pse fusion. eg. "nn","linear"')    
     
-    parser.add_argument('--res_dir', default='./results_reclass_ss', help='Path to the folder where the results should be stored')
+    parser.add_argument('--res_dir', default='./results_pse26_neww', help='Path to the folder where the results should be stored')
     parser.add_argument('--num_workers', default=8, type=int, help='Number of data loading workers')
     parser.add_argument('--rdm_seed', default=1, type=int, help='Random seed')
     parser.add_argument('--device', default='cuda', type=str,
@@ -525,20 +531,23 @@ if __name__ == '__main__':
     parser.add_argument('--preload', dest='preload', action='store_true',
                         help='If specified, the whole dataset is loaded to RAM at initialization')
     parser.set_defaults(preload=False)
-    parser.add_argument('--label_class', default='label_18class', type=str, help='it can be label_19class or label_44class')
+    parser.add_argument('--label_class', default='label_51class', type=str, help='it can be label_19class or label_44class')
     parser.add_argument('--Delet_label_class', default=[], type=list, help='it can be label_19class or label_44class')
-    parser.add_argument('--x_labels_list', default=['BI','FO','NK','V','O','OT','Z','S','A','WR','F','WI','C','B','M','P','G','BR'], type=list, help='The name of classes')
-    parser.add_argument('--main_classes', default=[9,4,14], type=list, help='Main classes we want do not change')
-    parser.add_argument('--others_classes', default=10, type=int, help='the class of others')
+    parser.add_argument('--x_labels_list', default=["c", "vs","b","of","f","to","m","p","po","wi-bi","fo","ptwr","s","z","a","water","g","ot","v","nk","be","g-h","joob","o","sb"] , type=list, help='The name of classes')
+    parser.add_argument('--main_classes', default=[0,5,8,9,14,24], type=list, help='Main classes we want do not change')
+    parser.add_argument('--others_classes', default=17, type=int, help='the class of others')
+    parser.add_argument('--cm_test_classes', default=[0,5,8,9,14,17,24], type=list, help='Main classes we want to show in confusion matrix')
+    parser.add_argument('--x_labels_list_test', default=["c","to","po","wi-bi","a","ot","sb"] , type=list, help='The name of classes for test confusion matrix')
+
 
 
 
     # Training parameters
-    parser.add_argument('--epochs', default=3, type=int, help='Number of epochs per fold')
-    parser.add_argument('--batch_size', default=16, type=int, help='Batch size')
+    parser.add_argument('--epochs', default=100, type=int, help='Number of epochs per fold')
+    parser.add_argument('--batch_size', default=256, type=int, help='Batch size')
     parser.add_argument('--lr', default=0.001, type=float, help='Learning rate')
     parser.add_argument('--gamma', default=1, type=float, help='Gamma parameter of the focal loss')
-    parser.add_argument('--npixel', default=64, type=int, help='Number of pixels to sample from the input images')
+    parser.add_argument('--npixel', default=10, type=int, help='Number of pixels to sample from the input images')
 
     # Architecture Hyperparameters
     ## PSE
@@ -558,13 +567,13 @@ if __name__ == '__main__':
     parser.add_argument('--T', default=1000, type=int, help='Maximum period for the positional encoding')
     parser.add_argument('--positions', default='bespoke', type=str,
                         help='Positions to use for the positional encoding (bespoke / order)')
-    parser.add_argument('--lms', default=55, type=int,
+    parser.add_argument('--lms', default=26, type=int,
                         help='Maximum sequence length for positional encoding (only necessary if positions == order)')
     parser.add_argument('--dropout', default=0.2, type=float, help='Dropout probability')
 
     ## Classifier
-    parser.add_argument('--num_classes', default=18, type=int, help='Number of classes')
-    parser.add_argument('--mlp4', default='[256, 64, 32, 18]', type=str, help='Number of neurons in the layers of MLP4- pse and tae nedd 256 except 128')
+    parser.add_argument('--num_classes', default=25, type=int, help='Number of classes')
+    parser.add_argument('--mlp4', default='[256, 64, 32, 25]', type=str, help='Number of neurons in the layers of MLP4- pse and tae nedd 256 except 128')
 
     args= parser.parse_args(args=[])
     args= vars(args)
