@@ -130,13 +130,19 @@ class PseTae(nn.Module):
             out = torch.divide(torch.add(out_s1, out_s2), 2.0)
 
         elif self.fusion_type == 'early':
-
-            data_s1, mask_s1 = input_s1
-            data_s2, _ = input_s2
-
-            data = torch.cat((data_s1, data_s2), dim=2)
-             
-            out = (data, mask_s1) # mask_s1 = mask_s2
+                                                       
+            input_s11,extra_fe = input_s1
+            input_s22,extra_fe = input_s2                      
+            
+            data_s1, mask_s1 = input_s11
+            data_s2, _ = input_s22
+           
+            data_s12 = torch.cat((data_s1, data_s2), dim=2)            
+           
+            input_s1122 =[data_s12, mask_s1] # mask_s1 = mask_s2
+            
+            out = [input_s1122,extra_fe]
+                        
             out = self.spatial_encoder_earlyFusion(out)
             out = self.temporal_encoder_earlyFusion(out, dates[1]) #indexed for sentinel-2 dates
             out = self.decoder(out)
