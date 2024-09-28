@@ -9,6 +9,8 @@ from datetime import datetime
 
 from models.pse_fusion import PixelSetEncoder 
 from models.tae_fusion import TemporalAttentionEncoder 
+from models.convlstm_fusion import convlstm 
+
 from models.decoder import get_decoder
 
 
@@ -21,7 +23,7 @@ class PseTae(nn.Module):
                  extra_size=4,
                  n_head=4, d_k=32, d_model=None, mlp3=[512, 128, 128], dropout=0.2, T=1000, len_max_seq=55,
                  positions=None,
-                 mlp4=[128, 64, 32, 12], fusion_type=None):
+                 mlp4=[128, 64, 32, 12], fusion_type=None,hidden_dim=32, kernel_size=3,input_neuron = 128, output_dim=128):
         
         super(PseTae, self).__init__()
         
@@ -41,6 +43,9 @@ class PseTae(nn.Module):
         self.temporal_encoder_earlyFusion = TemporalAttentionEncoder(in_channels=mlp2[-1], n_head=n_head, d_k=d_k, d_model=d_model,
                                                          n_neurons=mlp3, dropout=dropout,
                                                         T=T, len_max_seq=self.s2_max_len, positions=positions)
+
+        self.convlstm_earlyFusion = convlstm(input_dimc=1, hidden_dim=32, kernel_size=3,input_neuron = 128, output_dim=128,bias=False)  
+         
 
         # ----------------pse fusion
         self.mlp1_s1 = copy.deepcopy(mlp1)
@@ -147,7 +152,27 @@ class PseTae(nn.Module):
             out = self.temporal_encoder_earlyFusion(out, dates[1]) #indexed for sentinel-2 dates
             out = self.decoder(out)
             
-        return out
+        
+        
+        elif self.fusion_type == 'convlstm':
+                                                       
+            input_s11,extra_fe = input_s1
+            input_s22,extra_fe = input_s2                      
+            
+            data_s1, mask_s1 = input_s11
+            data_s2, _ = input_s22
+           
+            data_s12 = torch.cat((data_s1, data_s2), dim=2)            
+           
+            input_s1122 =[data_s12, mask_s1] # mask_s1 = mask_s2
+            
+            out = [input_s1122,extra_fe]
+                        
+            out = self.spatial_encoder_earlyFusion(out)
+            out = self.convlstm_earlyFusion(out) #indexed for sentinel-2 dates
+            out = self.decoder(out)
+            
+        return out       
 
 
     def param_ratio(self):
@@ -174,9 +199,15 @@ class PseTae(nn.Module):
             t = get_ntrainparams(self.temporal_encoder_earlyFusion)
             c = get_ntrainparams(self.decoder)
             total = s + t + c
+            
+        elif self.fusion_type == 'convlstm':  
+            s = get_ntrainparams(self.spatial_encoder_earlyFusion)
+            t = get_ntrainparams(self.convlstm_earlyFusion)
+            c = get_ntrainparams(self.decoder)
+            total = s + t + c
 
         print('TOTAL TRAINABLE PARAMETERS : {}'.format(total))
-        print('RATIOS: Spatial {:5.1f}% , Temporal {:5.1f}% , Classifier {:5.1f}%'.format(s / total * 100,
+        print('RATIOS: Spatial {:5.1f}% , convlstm {:5.1f}% , Classifier {:5.1f}%'.format(s / total * 100,
                                                                                           t / total * 100,
                                                                                           c / total * 100))
 
