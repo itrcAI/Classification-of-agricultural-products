@@ -207,7 +207,7 @@ class PseTae(nn.Module):
             total = s + t + c
 
         print('TOTAL TRAINABLE PARAMETERS : {}'.format(total))
-        print('RATIOS: Spatial {:5.1f}% , convlstm {:5.1f}% , Classifier {:5.1f}%'.format(s / total * 100,
+        print('RATIOS: Spatial {:5.1f}% , Transformer {:5.1f}% , Classifier {:5.1f}%'.format(s / total * 100,
                                                                                           t / total * 100,
                                                                                           c / total * 100))
 
