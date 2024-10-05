@@ -90,9 +90,9 @@ threshold: for clustering close groups of number of pix
 def data_len(path: str) -> int:
   """""
   It returns the number of sample
-  path: path to the dataset befor DATA folder
+  path: path to the dataset
   """""
-  data_folder = os.path.join(path, 'DATA')
+  data_folder = path
   l = [f for f in os.listdir(data_folder) if f.endswith('.npy')]
   pid = [int(f.split('.')[0]) for f in l]
   pid = list(np.sort(pid))
@@ -487,6 +487,4 @@ def extract_ND_3D(path_source: str,
     save_path_cn = os.path.join(path_Rsave, "std_var_3D.png")
     plt.savefig(save_path_cn)
     plt.close()
-
-
 
