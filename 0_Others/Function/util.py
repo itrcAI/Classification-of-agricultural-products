@@ -136,6 +136,27 @@ path: path to the source of data (get .npy in this path)
     return files
 
 
+def check_samples_existence(path: str, sample_names: list) -> dict:
+    """
+    Check if samples with the given names exist among the loaded .npy samples
+    path: path to the source of data
+    sample_names: list of sample names to check for existence
+    """
+    loaded_samples = get_all_npy(path)
+    results = {}
+    for sample_name in sample_names:
+        results[sample_name] = sample_name in loaded_samples
+
+    for sample_name, exists in results.items():
+        if exists:
+            print(f"Sample with name '{sample_name}' exists.")
+        else:
+            print(f"Sample with name '{sample_name}' does not exist.")
+    
+    return results
+
+
+
 def remove_dim(dim: int,
                 npy_files : list,
                 list_spec : list) -> np.array:
@@ -487,4 +508,6 @@ def extract_ND_3D(path_source: str,
     save_path_cn = os.path.join(path_Rsave, "std_var_3D.png")
     plt.savefig(save_path_cn)
     plt.close()
+    
+
 
