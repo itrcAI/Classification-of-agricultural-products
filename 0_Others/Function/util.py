@@ -1,4 +1,5 @@
-# %%
+
+
 import torch
 import torch.utils.data as data
 import torchnet as tnt
@@ -23,8 +24,8 @@ import pickle as pkl
 import argparse
 import pprint
 
-# %%
-# report from number of pixle for each file
+
+
 def extract_all_pixle(path: str,
                       save_fig: str) -> None:
     
@@ -121,6 +122,28 @@ def data_check(path: str) -> None:
     if x0.shape[0] != 55 or x0.shape[1] != 4:
       print("Bpixel: ", pid[item], ", x0.shape[0]: ", x0.shape[0], ", x0.shape[1]: ", x0.shape[1])
 
+def check_geo(data_path: str,
+              geo_path: str):
+  """""
+  It returns the samples which are not in geo file
+  data_path: path to the .npy
+  geo_path: path to the geo geo file
+  """""
+  l = [f for f in os.listdir(data_path) if f.endswith('.npy')]
+  pid = [int(f.split('.')[0]) for f in l]
+  pid = list(np.sort(pid))
+  print("len_Samples:",len(pid))
+  
+  with open(geo_path, 'r') as f:
+   data = json.load(f)
+  sample_numbers = list(data.keys())
+  sample_numbers = list(map(int, sample_numbers))
+  sample_numbers = list(np.sort(sample_numbers))
+  print("len_geo:",  len(sample_numbers))
+
+  missing_numbers = [num for num in pid if num not in sample_numbers]
+
+  return missing_numbers
 
 def get_all_npy(path : str) -> dict:
     """""
