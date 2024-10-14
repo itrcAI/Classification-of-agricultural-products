@@ -9,6 +9,8 @@ from datetime import datetime
 
 from models.pse_fusion import PixelSetEncoder 
 from models.tae_fusion import TemporalAttentionEncoder 
+from models.convlstm_fusion import convlstm 
+
 from models.decoder import get_decoder
 
 
@@ -17,18 +19,20 @@ class PseTae(nn.Module):
     Pixel-Set encoder + Temporal Attention Encoder sequence classifier
     """
 
-    def __init__(self, input_dim=10, mlp1=[10, 32, 64], pooling='mean_std', mlp2=[132, 128], with_extra=False,
+    def __init__(self, input_dim_s1=2,input_dim_s2=10, mlp1=[10, 32, 64], pooling='mean_std', mlp2=[132, 128], with_extra=False,
                  extra_size=4,
-                 n_head=4, d_k=32, d_model=None, mlp3=[512, 128, 128], dropout=0.2, T=1000, len_max_seq=24,
+                 n_head=4, d_k=32, d_model=None, mlp3=[512, 128, 128], dropout=0.2, T=1000, len_max_seq=55,
                  positions=None,
-                 mlp4=[128, 64, 32, 12], fusion_type=None):
+                 mlp4=[128, 64, 32, 12], fusion_type=None,hidden_dim=32, kernel_size=3,input_neuron = 128, output_dim=128):
         
         super(PseTae, self).__init__()
         
 
         self.s1_max_len = len_max_seq
         self.s2_max_len = len_max_seq
-        self.early_seq_mlp1 = [12, 32, 64]
+        
+        self.early_seq_mlp1 = copy.deepcopy(mlp1)
+        self.early_seq_mlp1[0] = input_dim_s1+input_dim_s2      
         self.positions = positions 
         
 
@@ -40,16 +44,19 @@ class PseTae(nn.Module):
                                                          n_neurons=mlp3, dropout=dropout,
                                                         T=T, len_max_seq=self.s2_max_len, positions=positions)
 
+        self.convlstm_earlyFusion = convlstm(input_dimc=1, hidden_dim=32, kernel_size=3,input_neuron = 128, output_dim=128,bias=False)  
+         
+
         # ----------------pse fusion
         self.mlp1_s1 = copy.deepcopy(mlp1)
-        self.mlp1_s1[0] = 2 
+        self.mlp1_s1[0] = input_dim_s1 
         self.mlp3_pse = [1024, 512, 256]  
           
 
-        self.spatial_encoder_s2 =  PixelSetEncoder(input_dim, mlp1=mlp1, pooling=pooling, mlp2=mlp2, with_extra=with_extra,
+        self.spatial_encoder_s2 =  PixelSetEncoder(input_dim_s2, mlp1=mlp1, pooling=pooling, mlp2=mlp2, with_extra=with_extra,
                                                extra_size=extra_size)
         
-        self.spatial_encoder_s1 = PixelSetEncoder(self.mlp1_s1[0], mlp1=self.mlp1_s1, pooling=pooling, mlp2=mlp2, with_extra=with_extra,
+        self.spatial_encoder_s1 = PixelSetEncoder(input_dim_s1, mlp1=self.mlp1_s1, pooling=pooling, mlp2=mlp2, with_extra=with_extra,
                                        extra_size=extra_size)
     
 
@@ -128,18 +135,44 @@ class PseTae(nn.Module):
             out = torch.divide(torch.add(out_s1, out_s2), 2.0)
 
         elif self.fusion_type == 'early':
-
-            data_s1, mask_s1 = input_s1
-            data_s2, _ = input_s2
-
-            data = torch.cat((data_s1, data_s2), dim=2)
-             
-            out = (data, mask_s1) # mask_s1 = mask_s2
+                                                       
+            input_s11,extra_fe = input_s1
+            input_s22,extra_fe = input_s2                      
+            
+            data_s1, mask_s1 = input_s11
+            data_s2, _ = input_s22
+           
+            data_s12 = torch.cat((data_s1, data_s2), dim=2)            
+           
+            input_s1122 =[data_s12, mask_s1] # mask_s1 = mask_s2
+            
+            out = [input_s1122,extra_fe]
+                        
             out = self.spatial_encoder_earlyFusion(out)
             out = self.temporal_encoder_earlyFusion(out, dates[1]) #indexed for sentinel-2 dates
             out = self.decoder(out)
             
-        return out
+        
+        
+        elif self.fusion_type == 'convlstm':
+                                                       
+            input_s11,extra_fe = input_s1
+            input_s22,extra_fe = input_s2                      
+            
+            data_s1, mask_s1 = input_s11
+            data_s2, _ = input_s22
+           
+            data_s12 = torch.cat((data_s1, data_s2), dim=2)            
+           
+            input_s1122 =[data_s12, mask_s1] # mask_s1 = mask_s2
+            
+            out = [input_s1122,extra_fe]
+                        
+            out = self.spatial_encoder_earlyFusion(out)
+            out = self.convlstm_earlyFusion(out) #indexed for sentinel-2 dates
+            out = self.decoder(out)
+            
+        return out       
 
 
     def param_ratio(self):
@@ -166,15 +199,22 @@ class PseTae(nn.Module):
             t = get_ntrainparams(self.temporal_encoder_earlyFusion)
             c = get_ntrainparams(self.decoder)
             total = s + t + c
+            
+        elif self.fusion_type == 'convlstm':  
+            s = get_ntrainparams(self.spatial_encoder_earlyFusion)
+            t = get_ntrainparams(self.convlstm_earlyFusion)
+            c = get_ntrainparams(self.decoder)
+            total = s + t + c
 
         print('TOTAL TRAINABLE PARAMETERS : {}'.format(total))
-        print('RATIOS: Spatial {:5.1f}% , Temporal {:5.1f}% , Classifier {:5.1f}%'.format(s / total * 100,
+        print('RATIOS: Spatial {:5.1f}% , Transformer {:5.1f}% , Classifier {:5.1f}%'.format(s / total * 100,
                                                                                           t / total * 100,
                                                                                           c / total * 100))
 
 def get_ntrainparams(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
+    
+    
 
 ##########starts er
 class PseTae_pretrained(nn.Module):
@@ -197,13 +237,18 @@ class PseTae_pretrained(nn.Module):
         self.model_instances = []
 
         m = PseTae(**hyperparameters)
+        
+        
         if device == 'cpu':
             map_loc = 'cpu'
         else:
             map_loc = 'cuda:{}'.format(torch.cuda.current_device())
             m = m.cuda()
-        d = torch.load(os.path.join(weight_folder, 'model.pth.tar'), map_location=map_loc)
-        m.load_state_dict(d['state_dict'])
+        
+        m.load_state_dict(
+            torch.load(os.path.join(weight_folder,  'model.pth.tar'))['state_dict'])
+        m.eval()        
+        
         self.model_instances.append(m)
         print('Successfully loaded {} model instances')
 ########################################er end but doeasnot test
@@ -231,5 +276,6 @@ class PseTae_pretrained(nn.Module):
         with torch.no_grad():
             pred = self.forward(input_s1, input_s2, dates).argmax(dim=1)
         return pred
+
 
 

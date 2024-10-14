@@ -88,8 +88,11 @@ class PseTae_pretrained(nn.Module):
             else:
                 map_loc = 'cuda:{}'.format(torch.cuda.current_device())
                 m = m.cuda()
-            d = torch.load(os.path.join(f, 'model.pth.tar'), map_location=map_loc)
-            m.load_state_dict(d['state_dict'])
+
+            m.load_state_dict(
+                torch.load(os.path.join(f,  'model.pth.tar'))['state_dict'])
+            m.eval()                
+
             self.model_instances.append(m)
         print('Successfully loaded {} model instances'.format(self.n_folds))
 

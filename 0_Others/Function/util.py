@@ -142,6 +142,7 @@ def check_geo(data_path: str,
   print("len_geo:",  len(sample_numbers))
 
   missing_numbers = [num for num in pid if num not in sample_numbers]
+  print("len_different:",  len(missing_numbers))
 
   return missing_numbers
 
