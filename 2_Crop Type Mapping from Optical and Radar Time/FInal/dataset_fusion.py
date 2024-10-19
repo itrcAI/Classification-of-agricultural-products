@@ -2,6 +2,7 @@ import torch
 from torch import Tensor
 from torch.utils import data
 import pickle as pkl
+import copy
 
 import pandas as pd
 import numpy as np
@@ -13,12 +14,11 @@ import json
 import random
 
 class PixelSetData(data.Dataset):
-    def __init__(self, folder,pms_extra , labels, npixel, sub_classes=None, norm_s1=None, norm_s2=None,
+    def __init__(self, folder, labels, npixel, sub_classes=None, norm_s1=None, norm_s2=None,
                  extra_feature=None, jitter=(0.01, 0.05), minimum_sampling=27, interpolate_method ='nn', return_id=False, fusion_type=None):
         """
         Args:
             folder (str): path to the main folder of the dataset, formatted as indicated in the readme
-            pms_extra (str): path to  save the mean_std of extra feature
             labels (str): name of the nomenclature to use in the labels.json file
             npixel (int): Number of sampled pixels in each parcel
             sub_classes (list): If provided, only the samples from the given list of classes are considered.
@@ -34,7 +34,6 @@ class PixelSetData(data.Dataset):
         super(PixelSetData, self).__init__()
 
         self.folder = folder
-        self.pms_extra = pms_extra
         self.data_folder = os.path.join(folder, 'DATA')
         self.meta_folder = os.path.join(folder, 'META')
         self.labels = labels
@@ -54,6 +53,7 @@ class PixelSetData(data.Dataset):
         l = [f for f in os.listdir(self.data_folder) if f.endswith('.npy')]
         self.pid = [int(f.split('.')[0]) for f in l]
         self.pid = list(np.sort(self.pid))
+        self.pid_shape = self.pid.copy()
         self.pid = list(map(str, self.pid))
         self.len = len(self.pid)        
 
@@ -111,22 +111,10 @@ class PixelSetData(data.Dataset):
 
             if isinstance(self.extra[list(self.extra.keys())[0]], int):
                 for k in self.extra.keys():
-                    self.extra[k] = [self.extra[k]]
-            
-            
-            old_precision = pd.get_option('display.float_format')
-            pd.set_option('display.float_format', lambda x: '%.14f' % x)            
-            df = pd.DataFrame(self.extra).transpose()            
-            pd.set_option('display.float_format', old_precision)
-                                              
-            self.extra_m, self.extra_s = np.array(df.mean(axis=0)), np.array(df.std(axis=0))                                  
-            
-            
-            ##combine extra_mean and extra_std to save in ms_extra.pkl for using in org file
-            combined_array = np.array([ self.extra_m, self.extra_s])
-            with open(os.path.join(pms_extra, 'ms_extra.pkl'), 'wb') as f:
-              pkl.dump(combined_array, f)
-
+                    self.extra[k] = [self.extra[k]]                       
+         
+            df = pd.DataFrame(self.extra).transpose()                                                         
+            self.extra_m, self.extra_s = np.array(df.mean(axis=0)), np.array(df.std(axis=0))                                                      
 
     # get similar day-of-year in s1 for s2
     def similar_sequence(self, input_s1, input_s2):
@@ -155,7 +143,10 @@ class PixelSetData(data.Dataset):
         res = np.concatenate((np.expand_dims(vv_interp, 1), np.expand_dims(vh_interp, 1)), axis = 1)
 
         return res   
-        
+  
+  
+    def pid_shape_e(self):
+        return self.pid_shape
     
     def __len__(self):
         return self.len
@@ -293,12 +284,15 @@ class PixelSetData(data.Dataset):
         if self.extra_feature is not None:
         
             
+            
             ef = (self.extra[str(self.pid[item])] - self.extra_m) / self.extra_s
+            
+            
             ef = torch.from_numpy(ef).float()
-            
-            
+                      
 
             ef = torch.stack([ef for _ in range(data[0].shape[0])], dim=0)
+            
             data = (data, ef)
 
             ef2 = (self.extra[str(self.pid[item])] - self.extra_m) / self.extra_s  ###errrrrr
@@ -306,6 +300,7 @@ class PixelSetData(data.Dataset):
 
             ef2 = torch.stack([ef2 for _ in range(data2[0].shape[0])], dim=0)   ###errrrrr
             data2 = (data2, ef2)                                               ###errrrrr
+            
 
         if self.return_id :
             return data, data2, torch.from_numpy(np.array(y, dtype=int)), (Tensor(s1_item_date), Tensor(s2_item_date)), self.pid[item]
@@ -318,9 +313,9 @@ class PixelSetData(data.Dataset):
 class PixelSetData_preloaded(PixelSetData):
     """ Wrapper class to load all the dataset to RAM at initialization (when the hardware permits it).
     """
-    def __init__(self, folder, pms_extra, labels, npixel, sub_classes=None, norm_s1=None, norm_s2=None,
+    def __init__(self, folder, labels, npixel, sub_classes=None, norm_s1=None, norm_s2=None,
                  extra_feature=None, jitter=(0.01, 0.05), minimum_sampling=27, interpolate_method ='nn', return_id=False, fusion_type=None):
-        super(PixelSetData_preloaded, self).__init__(folder,pms_extra, labels, npixel, sub_classes, norm_s1, norm_s2, extra_feature, jitter, minimum_sampling, interpolate_method, return_id, fusion_type)
+        super(PixelSetData_preloaded, self).__init__(folder, labels, npixel, sub_classes, norm_s1, norm_s2, extra_feature, jitter, minimum_sampling, interpolate_method, return_id, fusion_type)
         
         self.samples = []
         print('Loading samples to memory . . .')
