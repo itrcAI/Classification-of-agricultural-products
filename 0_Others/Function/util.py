@@ -534,4 +534,36 @@ def extract_ND_3D(path_source: str,
     plt.close()
     
 
-
+def result_analysis(path: str,
+                      save_fig: str) -> None:
+    """"
+Plot barchart of accuracy for models in different cities
+path: path to the .csv file. must be matrix each colum is city and each row is model with their names
+save_fig: path to save png
+    """"" 
+    # Load data from the CSV file
+    data = pd.read_csv(path, index_col=0)
+    # Get the model names and city names
+    model_names = data.index
+    city_names = data.columns
+    # Define colors for each model
+    colors = plt.cm.get_cmap('tab10', len(model_names))
+    # Plotting the bar chart
+    fig, ax = plt.subplots(figsize=(16, 10))
+    bar_width = 0.15
+    x = np.arange(len(city_names))
+    for i, model in enumerate(model_names):
+        model_data = data.loc[model]
+        ax.bar(x + i * bar_width, model_data, width=bar_width, color=colors(i), label=model)
+    ax.set_xticks(x + 0.35)
+    ax.set_xticklabels(city_names)
+    ax.set_xlabel('Cities', fontsize=15)
+    ax.set_ylabel('Accuracy (%)', fontsize=15)
+    ax.set_ylim([75,100])
+    ax.set_title('Model Accuracy in Different Cities', fontsize=16)
+    ax.legend(title='Models', bbox_to_anchor=(1, 1), loc='upper left', fontsize=13)
+    ax.tick_params(axis='both', which='major', labelsize=14)
+    plt.grid("on")
+    save_path_bar = os.path.join(save_fig, 'analysis.png')
+    plt.savefig(save_path_bar)
+    plt.close()
