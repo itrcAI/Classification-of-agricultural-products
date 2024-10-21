@@ -560,7 +560,6 @@ save_fig: path to save png
     ax.set_xlabel('Cities', fontsize=15)
     ax.set_ylabel('Accuracy (%)', fontsize=15)
     ax.set_ylim([75,100])
-    ax.set_title('Model Accuracy in Different Cities', fontsize=16)
     ax.legend(title='Models', bbox_to_anchor=(1, 1), loc='upper left', fontsize=13)
     ax.tick_params(axis='both', which='major', labelsize=14)
     plt.grid("on")
