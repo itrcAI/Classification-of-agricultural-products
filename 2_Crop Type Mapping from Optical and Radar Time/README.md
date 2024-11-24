@@ -1,5 +1,5 @@
 # Five Models
-This repository explores five deep learning models, drawing inspiration from the methodologies outlined in [Paper1] (https://www.mdpi.com/2072-4292/13/22/4668)  and [Paper2] (https://arxiv.org/abs/1911.07757).
+This repository explores five deep learning models, drawing inspiration from the methodologies outlined in [Paper1](https://www.mdpi.com/2072-4292/13/22/4668) and [Paper2](https://arxiv.org/abs/1911.07757).
 To facilitate experimentation and further research, code for both inference and transfer learning is included. 
 
 ## Requirements
@@ -20,6 +20,7 @@ The root folder should contain Sentinel-1 and Sentinel-2 directory named ```s1_d
 
 ## Features of data
 The dataset comprises data from various provinces in Iran, collected across two seasons. The specific features included in the dataset are detailed below.
+
 <img src="img/bands.jpeg" alt="features of data" width="500">
 
 ## Code 
