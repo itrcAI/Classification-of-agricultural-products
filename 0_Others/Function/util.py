@@ -534,39 +534,38 @@ def extract_ND_3D(path_source: str,
     plt.close()
     
 
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import os
-
 def result_analysis(path: str, save_fig: str,point:str) -> None:
     """"
-    Plot barchart of accuracy for models in different cities with points on top of each bar connected by lines in each city
-    path: path to the .csv file. Must be matrix where each column is a city and each row is a model with their names
+    Plot barchart of accuracy for rows in different column with points on top of each bar connected by lines in each column
+    path: path to the .csv file. Must be matrix 
     save_fig: path to save png
-    point: if "yes" points are drown on barchartT else they are not drown
     """ 
     # Load data from the CSV file
     data = pd.read_csv(path, index_col=0)
-    # Get the model names and city names
-    model_names = data.index
-    city_names = data.columns
-    # Define colors for each model
-    colors = plt.cm.get_cmap('viridis', len(model_names))
+    # Get the row names and column names
+    rows_name = data.index
+    columns_name = data.columns
+    print("rows_name:",rows_name)
+    print("columns_name:",columns_name)
+    # Define colors for each rows
+    colors = plt.cm.get_cmap('coolwarm', len(rows_name))
     # Plotting the bar chart
     fig, ax = plt.subplots(figsize=(23, 10))
-    bar_width = 0.1
-    space = 0.01  # Adjust the space between groups
-    x = np.arange(len(city_names))
+    bar_width = 0.07
+    space = 0.02  # Adjust the space between groups
+    x = np.arange(len(columns_name))
     
-    for i, model in enumerate(model_names):
-        model_data = data.loc[model]
-        ax.bar(x + i * (bar_width + space), model_data, width=bar_width, color=colors(i), label=model)
+    for i, rows_name in enumerate(rows_name):
+        print("i:",i)
+        print("rows_name:",rows_name)
+
+        row_data = data.loc[rows_name]
+        ax.bar(x + i * (bar_width + space), row_data, width=bar_width, color=colors(i), label=rows_name)
         
     ax.set_xticks(x + 0.35)
-    ax.set_xticklabels(city_names)
-    ax.set_ylabel('KAPPA (%)', fontsize=15)
-    ax.set_ylim([50, 100])
+    ax.set_xticklabels(columns_name)
+    ax.set_ylabel("Accuracy (%)", fontsize=15)
+    ax.set_ylim([0, 100])
     ax.legend(title='Deleted data', bbox_to_anchor=(1, 1), loc='upper left', fontsize=13)
     ax.tick_params(axis='both', which='major', labelsize=14)
     plt.grid(True)
@@ -574,15 +573,15 @@ def result_analysis(path: str, save_fig: str,point:str) -> None:
     # Adding points on top of each bar
     if point == "yes":
         print("with point")
-        for i, model in enumerate(model_names):
-            model_data = data.loc[model]
-            for j, city_data in enumerate(model_data):
+        for i, rows_name in enumerate(rows_name):
+            row_data = data.loc[rows_name]
+            for j, city_data in enumerate(row_data):
                 ax.plot(x[j] + i * (bar_width + space), city_data, marker='o', markersize=8, color='red')
         
         # Connecting points in each city with lines
-        for j in range(len(city_names)):
+        for j in range(len(columns_name)):
             city_data = data.iloc[:, j]
-            for i in range(len(model_names) - 1):
+            for i in range(len(rows_name) - 1):
                 ax.plot([x[j] + i * (bar_width + space), x[j] + (i + 1) * (bar_width + space)], [city_data[i], city_data[i + 1]], color='blue')
     else:
         print("with point")
