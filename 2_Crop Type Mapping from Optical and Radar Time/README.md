@@ -16,6 +16,7 @@ To facilitate experimentation and further research, code for both inference and 
 
 ## Folder structure
 The root folder should contain Sentinel-1 and Sentinel-2 directory named ```s1_data ``` and ```s2_data ```. Their sub-directories must be similar to the structure in the figure below
+
 <img src="img/folder_structure.PNG" alt="folder structure" width="500">
 
 ## Features of data
