@@ -159,6 +159,29 @@ path: path to the source of data (get .npy in this path)
                 files[name] = os.path.join(root, file) 
     return files
 
+def get_filtered_npy(path_source: str, group_labels:str, target_label: int):
+    """
+    return get_all_npy which filtered by specific target_label
+    group_labels:  label_19class  or  label_44class
+    target_label = labels we want to have
+    """
+    data_folder = os.path.join(path_source, 'DATA')
+    meta_folder = os.path.join(path_source, 'META') 
+    with open(os.path.join(meta_folder, 'labels.json'), 'r') as f:
+        labels_data = json.load(f)
+        labels_dict = labels_data[group_labels]
+    # list of filtered label sample name
+    keys_with_target_value = []
+    for key, value in labels_dict.items():
+        if value == target_label:
+            keys_with_target_value.append(key)
+    #make list of all npy in data folder
+    files = get_all_npy(data_folder)
+    keys_list = list(files.keys())
+    # final get_npy file
+    intersection_list = list(set(keys_with_target_value) & set(keys_list))
+    filtered_file = {key: files[key] for key in intersection_list if key in files}
+    return filtered_file
 
 def check_samples_existence(path: str, sample_names: list) -> dict:
     """
@@ -588,3 +611,32 @@ def result_analysis(path: str, save_fig: str,point:str) -> None:
     save_path_bar = os.path.join(save_fig, 'analysis.png')
     plt.savefig(save_path_bar)
     plt.close()
+
+def max_ndvi_check(path_source: str, path_Rsave: str, group_labels:str,target_label: int, band_index: int, threshold: int):
+    """
+    return the samples which have less than thereshold max ndvi for specific label
+    path_source: path to the main folder
+    path_Rsave: path to save result .JSON
+    group_labels:  label_19class  or  label_44class
+    target_label = labels we want to have
+    band_index: The index of the band to check.
+    threshold: The threshold value for the maximum.
+    """
+    
+    files = get_filtered_npy(path_source, group_labels, target_label)
+    result_list = []
+    for name, file_path in files.items():
+        load_data = np.load(file_path)
+        # mean of all pixel and dimention reduction
+        mean_data = np.mean(load_data, axis=2)
+        #select bad to process
+        selected_band = mean_data[:, band_index]
+        # find max value
+        max_value = np.max(selected_band)
+        #condition
+        if max_value < threshold:
+            result_list.append(name)
+
+    with open(os.path.join(path_Rsave,'vdvi_max.json'), 'w') as f:
+        json.dump(result_list, f)
+    return result_list
