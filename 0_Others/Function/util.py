@@ -656,11 +656,23 @@ def max_ndvi_check(path_source: str, path_Rsave: str, group_labels:str,target_la
     return result_list
     
 
-path_source = "/home/mhbokaei/s1/erfan_preprocces/delet"
-path_Rsave = "/home/mhbokaei/shakouri/utile"
-group_labels = "label_51class"
-target_label = 0
-band_index = 13
-threshold = 0.15
+def list_minus(path_mainlist:str, path_deletlist:str, path_Rsave:str ):
+    """"
+    eleminate some sample from the list
+    path_mainlist: path to the main .json list
+    path_deletlist: path to the delet .json list
+    path_mainlist: save needed .json list path
+    """ 
+    with open(path_mainlist, 'r') as file:
+        main_list = json.load(file)
+    print("len(main_list):", len(main_list))
 
-max_ndvi_check(path_source, path_Rsave, group_labels,target_label, band_index, threshold)
+    with open(path_deletlist, 'r') as file:
+        delet_list = json.load(file)
+    print("len(delet_list):", len(delet_list))
+
+    result = list(set(main_list) - set(delet_list))
+    print("len(result):", len(result))
+
+    with open(os.path.join(path_Rsave,'list.json'), 'w') as f:
+        json.dump(result, f)
