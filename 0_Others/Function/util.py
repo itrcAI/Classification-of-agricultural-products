@@ -159,6 +159,20 @@ path: path to the source of data (get .npy in this path)
                 files[name] = os.path.join(root, file) 
     return files
 
+def get_sample_name(data_folder : str, path_Rsave: str) -> dict:
+    """""
+save all samples name in list and print the number of samples  
+path: path to the source of data (get .npy in this path)
+path_Rsave: path to save result .JSON
+    """""   
+    files = get_all_npy(data_folder)
+    keys_list = list(files.keys())
+    print("len(keys_list):",len(keys_list))
+    with open(os.path.join(path_Rsave,'sample_name.json'), 'w') as f:
+        json.dump(keys_list, f)
+    return keys_list
+
+
 def get_filtered_npy(path_source: str, group_labels:str, target_label: int):
     """
     return get_all_npy which filtered by specific target_label
@@ -617,7 +631,7 @@ def max_ndvi_check(path_source: str, path_Rsave: str, group_labels:str,target_la
     return the samples which have less than thereshold max ndvi for specific label
     path_source: path to the main folder
     path_Rsave: path to save result .JSON
-    group_labels:  label_19class  or  label_44class
+    group_labels:  label_51class  or  label_51class
     target_label = labels we want to have
     band_index: The index of the band to check.
     threshold: The threshold value for the maximum.
@@ -637,6 +651,16 @@ def max_ndvi_check(path_source: str, path_Rsave: str, group_labels:str,target_la
         if max_value < threshold:
             result_list.append(name)
 
-    with open(os.path.join(path_Rsave,'vdvi_max.json'), 'w') as f:
+    with open(os.path.join(path_Rsave,'ndvi_max.json'), 'w') as f:
         json.dump(result_list, f)
     return result_list
+    
+
+path_source = "/home/mhbokaei/s1/erfan_preprocces/delet"
+path_Rsave = "/home/mhbokaei/shakouri/utile"
+group_labels = "label_51class"
+target_label = 0
+band_index = 13
+threshold = 0.15
+
+max_ndvi_check(path_source, path_Rsave, group_labels,target_label, band_index, threshold)
