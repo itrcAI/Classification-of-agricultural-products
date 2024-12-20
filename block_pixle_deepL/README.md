@@ -23,7 +23,22 @@ The root folder should contain Sentinel-1 and Sentinel-2 directory named ```s1_d
 ## Features of data
 The dataset comprises data from various provinces in Iran, collected across two seasons. The specific features included in the dataset are detailed below.
 
-<img src="assets/bands.jpeg" alt="features of data" width="500">
+| Sentinel-1 Band | Feature | Sentinel-2 Band | Feature |
+|---|---|---|---|
+| VV | Night Temperature | B1 | Blue |
+| VH | Day Temperature | B2 | Green |
+|  |  | B3 | Red |
+|  |  | B4 | Near-Infrared |
+|  |  | B5 | Mid-Infrared |
+|  |  | B6 | Shortwave Infrared |
+|  |  | B7 | Shortwave Infrared |
+|  |  | B8 | Geographic Longitude (X) |
+|  |  | B8A | Geographic Latitude (Y) |
+|  |  | B11 | Shortwave Infrared |
+|  |  | B12 | Thermal Infrared |
+|  |  | EVI | Enhanced Vegetation Index |
+|  |  | NDVI | Normalized Difference Vegetation Index |
+|  |  | SAVI | Soil-Adjusted Vegetation Index |
 
 ## Code 
 
