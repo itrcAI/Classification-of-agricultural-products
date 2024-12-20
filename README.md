@@ -1,9 +1,10 @@
-# Five Models
+# Crop Classification(Deep Learning)
 This repository explores five deep learning models, drawing inspiration from the methodologies outlined in [Paper1](https://www.mdpi.com/2072-4292/13/22/4668) and [Paper2](https://arxiv.org/abs/1911.07757).
 To facilitate experimentation and further research, code for both inference and transfer learning is included. 
 
 ## Requirements
-- pytorch + torchnet + torchinfo
+- Python 3.x
+- pytorch 2.4.1
 - numpy + pandas + sklearn + seaborn + JSON
 - pickle + matplotlib
 
@@ -29,17 +30,83 @@ The dataset comprises data from various provinces in Iran, collected across two 
 ### Code structure
 - The PyTorch implementations of the EARLY, PSE, TAE, SOFT_AVG, and ConvLSTM architectures are located in the `models` folder. 
 - The folder `learning` contains some additional utilities that are used for training and testing like weight_init and metrics. 
-- The repository also contains three high-level scripts `crop_ss_pse.py`, `crop_INF_ss_pse.py` and `crop_TL_ss_pse.py` for simple training, inference and transfer learning. 
+- The repository also contains three high-level scripts `run_main.py`, `run_inference.py` and `run_transferlearning.py` for simple training, inference and transfer learning. 
 - For making dataset `dataset_fusion.py` is prepared 
 
 ### Code Usage 
 
 #### Simple Training
-For basic training, you can leverage the `crop_ss_pse.py` script. Simply provide the script with the paths to your training, validation, and test datasets, along with the desired model and its hyperparameters.
+For basic training, you can leverage the `run_main.py` script. In this script, the desired model is executed by calling the run_main function and setting values for similar items, data path, result storage path, model, etc.
 
 #### Inference
-For model inference, you can utilize the `crop_INF_ss_pse.py` script. Simply provide the script with the path to the directory containing the trained model weights.
+For model inference, you can utilize the `run_inference.py` script. In this script, inference is performed by calling the run_inference function and setting values from the same centers, evaluation data path, stored weights, path storage results, model, etc.
 
 #### Transfer Learning
-The `crop_TL_ss_pse.py` script facilitates transfer learning. Specify the path to the directory containing the pre-trained model weights and indicate which layers you want to freeze during the fine-tuning process.
+The `run_transferlearning.py` script facilitates transfer learning. In this script, by calling the run_transferlearning function and setting values like data path, stored weights path, result storage path, model, etc., transfer learning models are executed.
 
+## Example Usage
+
+```python
+
+## run_main
+run_main(train_path, validation_path, test_path, mean_std_s1_path, mean_std_s2_path, save_result_path,
+              model_name,epoch, batch_sizee)
+
+    """
+    this function is for simple run
+    
+    Parameters:
+    - train_path: path to the train dataset
+    - validation_path: path to the validation dataset
+	- test_path: path to the test dataset
+	- mean_std_s1_path: path to the mean-std-s1 file
+	- mean_std_s2_path: path to the mean-std-s2 file
+	- save_result_path: path for save_result
+	- model_name: chose model
+	- epoch: number of epochs
+	- batch_sizee: number of batch size
+	
+    """
+
+
+## run_inference
+run_inference(test_path, mean_std_s1_path, mean_std_s2_path, weight_path, save_result_path,
+              model_name, batch_sizee)
+
+    """
+    this function is for inference
+    
+    Parameters:
+
+	- test_path: path to the test dataset
+	- mean_std_s1_path: path to the mean-std-s1 file
+	- mean_std_s2_path: path to the mean-std-s2 file
+	- weight_path: path to the stored weight
+	- save_result_path: path for save_result
+	- model_name: chose model
+	- batch_sizee: number of batch size
+	
+    """
+
+## run_transferlearning
+run_transferlearning(train_path, validation_path, test_path, mean_std_s1_path, mean_std_s2_path,weight_path, save_result_path,
+              model_name,epoch, batch_sizee)
+
+    """
+    this function is for Transfer learning
+    
+    Parameters:
+    - train_path: path to the train dataset
+    - validation_path: path to the validation dataset
+	- test_path: path to the test dataset
+	- mean_std_s1_path: path to the mean-std-s1 file
+	- mean_std_s2_path: path to the mean-std-s2 file
+	- weight_path: path to the stored weight	
+	- save_result_path: path for save_result
+	- model_name: chose model
+	- epoch: number of epochs
+	- batch_sizee: number of batch size
+	
+    """
+
+```
