@@ -18,12 +18,12 @@ To facilitate experimentation and further research, code for both inference and 
 ## Folder structure
 The root folder should contain Sentinel-1 and Sentinel-2 directory named ```s1_data ``` and ```s2_data ```. Their sub-directories must be similar to the structure in the figure below
 
-<img src="img/folder_structure.PNG" alt="folder structure" width="500">
+<img src="assets/folder_structure.PNG" alt="folder structure" width="500">
 
 ## Features of data
 The dataset comprises data from various provinces in Iran, collected across two seasons. The specific features included in the dataset are detailed below.
 
-<img src="img/bands.jpeg" alt="features of data" width="500">
+<img src="assets/bands.jpeg" alt="features of data" width="500">
 
 ## Code 
 
