@@ -1,0 +1,8 @@
+torch==2.4.1
+numpy
+pandas
+scikit-learn
+seaborn
+jsonlib  # If you meant JSON serialization, this library may fit
+matplotlib
+pickle-mixin  # Use only if pickle-related dependency is required
