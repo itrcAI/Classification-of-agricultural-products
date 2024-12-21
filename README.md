@@ -2,8 +2,8 @@
 
 This repository provides implementations of state-of-the-art machine learning and deep learning algorithms for classifying agricultural products. The project employs advanced techniques to achieve high accuracy and robustness in classification tasks. The methods are categorized as follows:
 
-- **[Pixel-based Machine Learning Models](#pixel-based-machine-learning-models)**
-- **[Pixel-based Deep Learning Models](#pixel-based-deep-learning-models)**
+- **[Pixel-based Machine Learning Models](https://github.com/itrcAI/Classification-of-agricultural-products/tree/main/pixle_base_Ml)**
+- **[Pixel-based Deep Learning Models](https://github.com/itrcAI/Classification-of-agricultural-products/tree/main/pixle_base_Dl)**
 - **[Pixel-block Based Deep Learning Models](https://github.com/itrcAI/Classification-of-agricultural-products/tree/main/block_pixle_deepL)**
 
 This project was carried out at the Telecommunications Research Center of Iran under the supervision of experienced professors and industry experts.
